@@ -13,7 +13,7 @@ from omegaconf import DictConfig, ListConfig
 from omegaconf import OmegaConf as om
 from transformers import PreTrainedTokenizerBase
 
-from llmfoundry import (COMPOSER_MODEL_REGISTRY, ComposerHFCausalLM,
+from llmfoundry import (ComposerHFCausalLM,
                         MPTForCausalLM, build_finetuning_dataloader,
                         build_text_denoising_dataloader)
 from llmfoundry.data.text_data import build_text_dataloader
@@ -197,10 +197,10 @@ def build_composer_model(model_cfg: DictConfig,
     warnings.filterwarnings(
         action='ignore',
         message='Torchmetrics v0.9 introduced a new argument class property')
-    if model_cfg.name not in COMPOSER_MODEL_REGISTRY:
+    if model_cfg.name not in ["hf_causal_lm"]:
         raise ValueError(
             f'Not sure how to build model with name={model_cfg.name}')
-    return COMPOSER_MODEL_REGISTRY[model_cfg.name](model_cfg, tokenizer)
+    return ComposerHFCausalLM(model_cfg, tokenizer)
 
 
 def build_composer_peft_model(
