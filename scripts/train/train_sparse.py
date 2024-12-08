@@ -198,7 +198,26 @@ def build_composer_model(model_cfg: DictConfig,
     if model_cfg.name not in ["hf_causal_lm"]:
         raise ValueError(
             f'Not sure how to build model with name={model_cfg.name}')
-    return ComposerHFCausalLM(model_cfg, tokenizer)
+    
+    # Update config_overrides for Llama models
+    config_overrides = {}
+    if hasattr(model_cfg, 'config_overrides'):
+        config_overrides = model_cfg.config_overrides
+        if 'attn_config' in config_overrides:
+            # Instead of setting attn_implementation, we'll set use_flash_attention_2
+            use_flash = config_overrides['attn_config'].get('attn_impl') == 'flash_attention_2'
+            del config_overrides['attn_config']
+    
+    # Create a new instance of ComposerHFCausalLM with the correct parameters
+    model = ComposerHFCausalLM(
+        tokenizer=tokenizer,
+        pretrained_model_name_or_path=model_cfg.pretrained_model_name_or_path,
+        pretrained=model_cfg.get('pretrained', True),
+        config_overrides=config_overrides,
+        use_auth_token=True,
+        use_flash_attention_2=use_flash
+    )
+    return model
 
 
 def build_composer_peft_model(
