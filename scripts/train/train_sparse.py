@@ -201,6 +201,7 @@ def build_composer_model(model_cfg: DictConfig,
     
     # Update config_overrides for Llama models
     config_overrides = {}
+    use_flash = False
     if hasattr(model_cfg, 'config_overrides'):
         config_overrides = model_cfg.config_overrides
         if 'attn_config' in config_overrides:
@@ -265,12 +266,13 @@ def print_trainable_parameters(model: torch.nn.Module) -> None:
 
 def build_dataloader(cfg: DictConfig, tokenizer: PreTrainedTokenizerBase,
                      device_batch_size: int):
-    if cfg.name == "finetuning":
+    if cfg.name not in ["finetuning"]:
         raise ValueError(f'Not sure how to build dataloader with config: {cfg}')
     return build_finetuning_dataloader(
         tokenizer,
         device_batch_size,
         cfg.dataset,
+        cfg.num_workers,
     )
 
 
