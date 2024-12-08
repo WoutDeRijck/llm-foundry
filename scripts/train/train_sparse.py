@@ -24,7 +24,7 @@ from llmfoundry.utils.config_utils import (log_config, pop_config,
                                            update_batch_size_info)
 
 import torch.nn.functional as TF
-from composer.trainer.dist_strategy import prepare_fsdp_module
+from composer.distributed.dist_strategy import prepare_fsdp_module
 from composer.utils import get_device
 
 
@@ -297,6 +297,8 @@ def main(cfg: DictConfig):
     # Mandatory model training configs
     model_config: DictConfig = pop_config(cfg, 'model', must_exist=True)
     tokenizer_config: DictConfig = pop_config(cfg, 'tokenizer', must_exist=True)
+    tokenizer_name: str = pop_config(tokenizer_config, 'name', must_exist=True)
+    tokenizer_kwargs: dict[str, Any] = pop_config(tokenizer_config, 'kwargs', must_exist=True)
     optimizer_config: Dict[str, Any] = pop_config(cfg,
                                                   'optimizer',
                                                   must_exist=True,
@@ -472,7 +474,7 @@ def main(cfg: DictConfig):
     logged_cfg.update({'fsdp_config': fsdp_config}, merge=True)
 
     # Build tokenizer
-    tokenizer = build_tokenizer(tokenizer_config)
+    tokenizer = build_tokenizer(tokenizer_name=tokenizer_name, tokenizer_kwargs=tokenizer_kwargs)
 
     # Build Model
     print('Initializing model...')
