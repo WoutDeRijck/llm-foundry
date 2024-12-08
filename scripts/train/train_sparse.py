@@ -611,7 +611,7 @@ def main(cfg: DictConfig):
         precision=precision,
         algorithms=algorithms,
         device_train_microbatch_size=device_train_microbatch_size,
-        fsdp_config=fsdp_config,  # type: ignore
+        parallelism_config={'fsdp': fsdp_config} if fsdp_config is not None else None,
         save_folder=save_folder,
         save_filename=save_filename,
         save_latest_filename=save_latest_filename,
@@ -627,8 +627,6 @@ def main(cfg: DictConfig):
         dist_timeout=dist_timeout,
     )
 
-    print('Logging config')
-    log_config(logged_cfg)
     torch.cuda.empty_cache()
 
     # Eval first if requested

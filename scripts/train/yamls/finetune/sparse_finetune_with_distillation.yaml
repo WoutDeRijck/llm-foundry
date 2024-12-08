@@ -1,4 +1,4 @@
-max_seq_len: 512
+max_seq_len: 4096
 global_seed: 17
 model_name_or_path: "meta-llama/Llama-3.2-3B-Instruct"
 precision: amp_bf16
@@ -42,10 +42,8 @@ tokenizer:
 train_loader:
   name: finetuning
   dataset:
-    hf_name: gsm8k
+    hf_name: WoutDeRijck/medical_reports
     split: train
-    hf_kwargs:
-      name: main
     max_seq_len: ${max_seq_len}
     allow_pad_trimming: false
     decoder_only_format: true
@@ -60,10 +58,8 @@ train_loader:
 eval_loader:
   name: finetuning
   dataset:
-    hf_name: gsm8k
-    split: test
-    hf_kwargs:
-      name: main
+    hf_name: WoutDeRijck/medical_reports
+    split: train
     max_seq_len: ${max_seq_len}
     allow_pad_trimming: false
     decoder_only_format: true
